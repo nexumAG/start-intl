@@ -1,20 +1,37 @@
-# start-intl
+# 🌍 start-intl
 
 <img align="right" src="https://avatars.githubusercontent.com/u/2322771?s=200&v=4" width="90" alt="nexum" />
 
-Locale routing for [`use-intl`](https://next-intl.dev/docs/environments/core-library) on TanStack Start: locale prefixes, detection, the locale cookie and a locale-aware `Link`. Translation stays plain `use-intl`.
+Locale routing for [`use-intl`](https://next-intl.dev/docs/environments/core-library) on [TanStack Start](https://tanstack.com/start/latest): locale prefixes, detection, the locale cookie and a locale-aware `Link`. Translation stays plain `use-intl`.
 
-Built for nexum's sites. 0.x is unstable: expect breaking changes in minor versions. Not supported: `localePrefix: 'never'`, locale per domain, translated pathnames.
+> [!IMPORTANT]
+> **Unofficial & unaffiliated.** This is a community package maintained by [nexum AG](https://www.nexum.com). It is **not** developed, endorsed, or supported by TanStack, and nexum AG is not affiliated with TanStack in any way. "TanStack" is a trademark of its respective owner and is used here only to describe what this package integrates with. For the official framework, see [tanstack.com](https://tanstack.com).
 
-## Getting started
+> [!WARNING]
+> **0.x is unstable:** expect breaking changes in minor versions. Not supported: `localePrefix: 'never'`, locale per domain, translated pathnames.
+
+👉 [Getting Started](#-getting-started)
+
+🧭 [How a request gets its locale](#-how-a-request-gets-its-locale)
+
+🧩 [Usage](#-usage)
+
+🔧 [Lower-level API](#-lower-level-api)
+
+🧪 [Local development](#-local-development)
+
+🐾 [Useful links](#-useful-links)
+
+## 👉 Getting Started
 
 ```bash
 npm install @nexum-ag/start-intl
 ```
 
-Peer dependencies: `@tanstack/react-router`, `@tanstack/react-start`, `react` 19 and `use-intl` 4.
+> [!NOTE]
+> `@tanstack/react-router`, `@tanstack/react-start`, `react` 19 and `use-intl` 4 are peer dependencies, so the package uses your app's copies.
 
-## How a request gets its locale
+## 🧭 How a request gets its locale
 
 The first match wins:
 
@@ -26,7 +43,9 @@ The first match wins:
 
 Only page requests are routed. Paths starting with `/api/`, `/_serverFn/`, `/_build/`, `/assets/`, `/@` or `/node_modules/`, and static files (`.ico`, `.png`, `.svg`, `.js`, `.css`, `.xml`, `.pdf`, …), pass through untouched. `/wp-admin.php` still counts as a page, so it gets the localised 404.
 
-## `defineRouting(config)`
+## 🧩 Usage
+
+### `defineRouting(config)`
 
 | Param | Type | Default | |
 |---|---|---|---|
@@ -50,7 +69,7 @@ export const routing = defineRouting({
 export type Locale = (typeof routing.locales)[number]
 ```
 
-## `createLocaleMiddleware(routing, options?)`
+### `createLocaleMiddleware(routing, options?)`
 
 A TanStack Start request middleware. On a page request it:
 
@@ -92,7 +111,7 @@ export const startInstance = createStart(() => ({
 }))
 ```
 
-## `createLocaleRewrite(routing)`
+### `createLocaleRewrite(routing)`
 
 Returns `{ input, output }` for the router's `rewrite` option. The route tree always starts with a `$locale` segment. With `as-needed`, `input` maps `/jobs` onto the `/de/jobs` route and `output` drops `/de` from rendered URLs. With `always` both do nothing.
 
@@ -110,7 +129,7 @@ export function getRouter() {
 }
 ```
 
-## `createLink(routing)`
+### `createLink(routing)`
 
 Returns a `Link` component that takes a plain `href` string, the way CMS links arrive. It needs a use-intl `IntlProvider` above it.
 
@@ -134,7 +153,7 @@ export const Link = createLink(routing)
 // <Link href="/de/jobs" locale="en">English</Link> → /en/jobs
 ```
 
-## `parseLocale(locale, routing)`
+### `parseLocale(locale, routing)`
 
 Returns `locale` typed as `Locale`, or throws the router's `notFound()` if it isn't one of `locales`. Exported from `@nexum-ag/start-intl/react`.
 
@@ -150,7 +169,9 @@ export const Route = createFileRoute('/$locale')({
 })
 ```
 
-## `resolveRequestRouting(request, routing)`
+## 🔧 Lower-level API
+
+### `resolveRequestRouting(request, routing)`
 
 The pure function behind the middleware. Call it yourself when the locale handling has to run inside your own middleware, for example after redirects or basic auth.
 
@@ -184,7 +205,7 @@ const { redirect, cookie } = resolveRequestRouting(
 )
 ```
 
-## Helpers
+### Helpers
 
 All exported from `@nexum-ag/start-intl` and pure.
 
@@ -197,7 +218,7 @@ All exported from `@nexum-ag/start-intl` and pure.
 | `getAcceptLanguageLocale(header, routing)` | The best match from an `Accept-Language` header, else `defaultLocale`. |
 | `serializeLocaleCookie(locale, routing)` | A `Set-Cookie` value using `cookie.name` and `cookie.maxAge`. |
 
-## Local development
+## 🧪 Local development
 
 Requires Node 22 or 24.
 
@@ -210,9 +231,21 @@ npm run lint       # biome
 npm run check:pkg  # build, then publint + are-the-types-wrong
 ```
 
-Published to [npm](https://www.npmjs.com/package/@nexum-ag/start-intl) on each GitHub release; the release tag has to match the version in `package.json`.
+### Tech stack
 
-## License
+- [**TypeScript**](https://www.typescriptlang.org/): `tsc` builds ESM and types, no bundler.
+- [**Vitest**](https://vitest.dev/): unit tests, jsdom + Testing Library.
+- [**Biome**](https://biomejs.dev/): linting and formatting.
+- Published to [**npm**](https://www.npmjs.com/package/@nexum-ag/start-intl) on each GitHub release (the release tag has to match the version in `package.json`).
+
+## 🐾 Useful links
+
+- [use-intl docs](https://next-intl.dev/docs/environments/core-library)
+- [TanStack Start middleware](https://tanstack.com/start/latest/docs/framework/react/guide/middleware)
+- [TanStack Router URL rewrites](https://tanstack.com/router/latest/docs/framework/react/guide/url-rewrites)
+- [next-intl's routing middleware](https://next-intl.dev/docs/routing/middleware), whose redirect and cookie rules this package follows
+
+## 📄 License
 
 Licensed under the Apache License, Version 2.0. See [LICENSE](./LICENSE).
 
