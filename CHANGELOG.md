@@ -3,12 +3,14 @@
 All notable changes to this package are documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
-package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Before
-1.0, minor versions may break the API.
+package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Betas may
+break the API; from 1.0.0 on, breaking changes require a major version.
 
-## [Unreleased]
+## [1.0.0-beta.1] - 2026-10-06
 
 ### Added
 
 - `defineRouting`, `createLocaleMiddleware`, `createLocaleRewrite`, `createLink` and
   `parseLocale`, consolidating the locale routing copied into nexum's TanStack Start sites.
+
+[1.0.0-beta.1]: https://github.com/nexumAG/start-intl/releases/tag/v1.0.0-beta.1

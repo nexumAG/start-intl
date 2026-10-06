@@ -8,7 +8,7 @@ Locale routing for [`use-intl`](https://next-intl.dev/docs/environments/core-lib
 > **Unofficial & unaffiliated.** This is a community package maintained by [nexum AG](https://www.nexum.com). It is **not** developed, endorsed, or supported by TanStack, and nexum AG is not affiliated with TanStack in any way. "TanStack" is a trademark of its respective owner and is used here only to describe what this package integrates with. For the official framework, see [tanstack.com](https://tanstack.com).
 
 > [!WARNING]
-> **0.x is unstable:** expect breaking changes in minor versions. Not supported: `localePrefix: 'never'`, locale per domain, translated pathnames.
+> **Beta:** until 1.0.0, any release may break the API, so pin the exact version. Not supported: `localePrefix: 'never'`, locale per domain, translated pathnames.
 
 👉 [Getting Started](#-getting-started)
 
