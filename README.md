@@ -1,8 +1,18 @@
 # start-intl
 
+<img align="right" src="https://avatars.githubusercontent.com/u/2322771?s=200&v=4" width="90" alt="nexum" />
+
 Locale routing for [`use-intl`](https://next-intl.dev/docs/environments/core-library) on TanStack Start: locale prefixes, detection, the locale cookie and a locale-aware `Link`. Translation stays plain `use-intl`.
 
 Built for nexum's sites. 0.x is unstable: expect breaking changes in minor versions. Not supported: `localePrefix: 'never'`, locale per domain, translated pathnames.
+
+## Getting started
+
+```bash
+npm install @nexum-ag/start-intl
+```
+
+Peer dependencies: `@tanstack/react-router`, `@tanstack/react-start`, `react` 19 and `use-intl` 4.
 
 ## How a request gets its locale
 
@@ -28,7 +38,7 @@ Only page requests are routed. Paths starting with `/api/`, `/_serverFn/`, `/_bu
 
 ```ts
 // i18n/routing.ts
-import { defineRouting } from 'start-intl'
+import { defineRouting } from '@nexum-ag/start-intl'
 
 export const routing = defineRouting({
   locales: ['de', 'en'],
@@ -58,7 +68,7 @@ A TanStack Start request middleware. On a page request it:
 ```ts
 // app/start.ts
 import { createStart } from '@tanstack/react-start'
-import { createLocaleMiddleware } from 'start-intl/middleware'
+import { createLocaleMiddleware } from '@nexum-ag/start-intl/middleware'
 import { routing } from '@/i18n/routing'
 
 function storyblokEditorLocale(url: URL) {
@@ -93,7 +103,7 @@ Returns `{ input, output }` for the router's `rewrite` option. The route tree al
 ```ts
 // app/router.tsx
 import { createRouter } from '@tanstack/react-router'
-import { createLocaleRewrite } from 'start-intl'
+import { createLocaleRewrite } from '@nexum-ag/start-intl'
 
 export function getRouter() {
   return createRouter({ routeTree, rewrite: createLocaleRewrite(routing) })
@@ -115,7 +125,7 @@ An href renders a plain `<a>` when it is external (`http://`, `https://`, `//`, 
 
 ```tsx
 // i18n/Link.tsx
-import { createLink } from 'start-intl/react'
+import { createLink } from '@nexum-ag/start-intl/react'
 import { routing } from '@/i18n/routing'
 
 export const Link = createLink(routing)
@@ -126,7 +136,7 @@ export const Link = createLink(routing)
 
 ## `parseLocale(locale, routing)`
 
-Returns `locale` typed as `Locale`, or throws the router's `notFound()` if it isn't one of `locales`. Exported from `start-intl/react`.
+Returns `locale` typed as `Locale`, or throws the router's `notFound()` if it isn't one of `locales`. Exported from `@nexum-ag/start-intl/react`.
 
 | Param | Type | |
 |---|---|---|
@@ -176,7 +186,7 @@ const { redirect, cookie } = resolveRequestRouting(
 
 ## Helpers
 
-All exported from `start-intl` and pure.
+All exported from `@nexum-ag/start-intl` and pure.
 
 | Function | Returns |
 |---|---|
@@ -186,3 +196,24 @@ All exported from `start-intl` and pure.
 | `getLocalisedPath(path, locale, routing)` | The URL path for `locale`, honouring `as-needed`. |
 | `getAcceptLanguageLocale(header, routing)` | The best match from an `Accept-Language` header, else `defaultLocale`. |
 | `serializeLocaleCookie(locale, routing)` | A `Set-Cookie` value using `cookie.name` and `cookie.maxAge`. |
+
+## Local development
+
+Requires Node 22 or 24.
+
+```bash
+npm install
+npm run build      # dist/ (ESM + types)
+npm test           # vitest
+npm run typecheck  # tsc --noEmit
+npm run lint       # biome
+npm run check:pkg  # build, then publint + are-the-types-wrong
+```
+
+Published to [npm](https://www.npmjs.com/package/@nexum-ag/start-intl) on each GitHub release; the release tag has to match the version in `package.json`.
+
+## License
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](./LICENSE).
+
+Copyright © nexum AG and its associated companies.

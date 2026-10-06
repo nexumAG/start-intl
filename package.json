@@ -1,19 +1,48 @@
 {
-  "name": "start-intl",
+  "name": "@nexum-ag/start-intl",
   "version": "0.0.0",
   "description": "Locale routing for use-intl on TanStack Start: prefixes, detection, the locale cookie and a locale-aware Link",
-  "license": "MIT",
-  "repository": "github:nexumAG/start-intl",
-  "type": "module",
-  "sideEffects": false,
+  "keywords": [
+    "i18n",
+    "locale",
+    "react",
+    "tanstack-router",
+    "tanstack-start",
+    "use-intl"
+  ],
+  "homepage": "https://github.com/nexumAG/start-intl#readme",
+  "bugs": "https://github.com/nexumAG/start-intl/issues",
+  "license": "Apache-2.0",
+  "author": "nexum AG",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexumAG/start-intl.git"
+  },
   "files": [
     "dist",
-    "!dist/**/*.spec.*"
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
+  "type": "module",
+  "sideEffects": false,
   "exports": {
-    ".": "./dist/index.js",
-    "./middleware": "./dist/middleware.js",
-    "./react": "./dist/react.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./middleware": {
+      "types": "./dist/middleware.d.ts",
+      "default": "./dist/middleware.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "default": "./dist/react.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
@@ -21,7 +50,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check:pkg": "npm run build && publint && attw --pack --profile esm-only"
   },
   "peerDependencies": {
     "@tanstack/react-router": "^1.170",
@@ -30,6 +60,7 @@
     "use-intl": "^4.14"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
     "@biomejs/biome": "2.5.15",
     "@tanstack/react-router": "1.170.41",
     "@tanstack/react-start": "1.168.60",
@@ -37,10 +68,14 @@
     "@types/node": "25.6.0",
     "@types/react": "19.2.18",
     "jsdom": "30.1.1",
+    "publint": "0.3.25",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "typescript": "7.0.2",
     "use-intl": "4.14.8",
     "vitest": "4.1.11"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
