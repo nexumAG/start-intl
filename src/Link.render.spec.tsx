@@ -142,9 +142,9 @@ describe('<Link>', () => {
   })
 
   it('renders a plain anchor for external hrefs', async () => {
-    renderAtLocale('de', <Link href="https://nexum.com">nexum</Link>)
+    renderAtLocale('de', <Link href="https://example.com">External</Link>)
 
-    expect(await hrefOf('nexum')).toBe('https://nexum.com')
+    expect(await hrefOf('External')).toBe('https://example.com')
   })
 
   it('only marks the exact page active unless told otherwise', async () => {

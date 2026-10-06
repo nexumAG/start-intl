@@ -8,15 +8,22 @@ describe('isInternalHref', () => {
   })
 
   it('treats absolute URLs and protocol-relative URLs as external', () => {
-    expect(isInternalHref('https://nexum.com')).toBe(false)
-    expect(isInternalHref('http://nexum.com')).toBe(false)
-    expect(isInternalHref('//nexum.com')).toBe(false)
-    expect(isInternalHref('www.nexum.com')).toBe(false)
+    expect(isInternalHref('https://example.com')).toBe(false)
+    expect(isInternalHref('http://example.com')).toBe(false)
+    expect(isInternalHref('//example.com')).toBe(false)
+    expect(isInternalHref('www.example.com')).toBe(false)
   })
 
-  it('treats mailto and tel as external', () => {
-    expect(isInternalHref('mailto:info@nexum.com')).toBe(false)
-    expect(isInternalHref('tel:+49123456')).toBe(false)
+  it.each([
+    'mailto:info@example.com',
+    'tel:+49123456',
+    'sms:+49123456',
+    'whatsapp://send?text=hi',
+    'ftp://example.com/file.zip',
+    'HTTPS://example.com',
+    'web+custom:payload',
+  ])('treats %j, which has a URI scheme, as external', (href) => {
+    expect(isInternalHref(href)).toBe(false)
   })
 
   it('treats hash-only hrefs and empty hrefs as external', () => {
