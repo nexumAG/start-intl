@@ -14,14 +14,9 @@ import {
 } from './request.js'
 import type { Routing } from './routing.js'
 
-const externalPrefixes = [
-  'http://',
-  'https://',
-  '//',
-  'www.',
-  'mailto:',
-  'tel:',
-]
+const URL_SCHEME = /^[a-z][a-z\d+.-]*:/i
+
+const schemelessExternalPrefixes = ['//', 'www.']
 
 export type SearchParser = (searchStr: string) => Record<string, unknown>
 
@@ -30,7 +25,10 @@ export function isInternalHref(href: string | undefined): boolean {
     return false
   }
 
-  return !externalPrefixes.some((prefix) => href.startsWith(prefix))
+  return (
+    !URL_SCHEME.test(href) &&
+    !schemelessExternalPrefixes.some((prefix) => href.startsWith(prefix))
+  )
 }
 
 // CMS hrefs carry raw query strings; parsing them with the router's own parser

@@ -14,9 +14,16 @@ describe('isInternalHref', () => {
     expect(isInternalHref('www.nexum.com')).toBe(false)
   })
 
-  it('treats mailto and tel as external', () => {
-    expect(isInternalHref('mailto:info@nexum.com')).toBe(false)
-    expect(isInternalHref('tel:+49123456')).toBe(false)
+  it.each([
+    'mailto:info@nexum.com',
+    'tel:+49123456',
+    'sms:+49123456',
+    'whatsapp://send?text=hi',
+    'ftp://nexum.com/file.zip',
+    'HTTPS://nexum.com',
+    'web+custom:payload',
+  ])('treats %j, which has a URI scheme, as external', (href) => {
+    expect(isInternalHref(href)).toBe(false)
   })
 
   it('treats hash-only hrefs and empty hrefs as external', () => {
