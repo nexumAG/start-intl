@@ -1,6 +1,6 @@
 {
   "name": "@nexum-ag/start-intl",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Locale routing for use-intl on TanStack Start: prefixes, detection, the locale cookie and a locale-aware Link",
   "keywords": [
     "i18n",
