@@ -147,6 +147,12 @@ describe('<Link>', () => {
     expect(await hrefOf('External')).toBe('https://example.com')
   })
 
+  it('renders a plain anchor for relative hrefs', async () => {
+    renderAtLocale('de', <Link href="foo">Foo</Link>)
+
+    expect(await hrefOf('Foo')).toBe('foo')
+  })
+
   it('only marks the exact page active unless told otherwise', async () => {
     renderAtLocale(
       'de',

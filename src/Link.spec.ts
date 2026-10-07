@@ -5,6 +5,15 @@ describe('isInternalHref', () => {
   it('treats absolute paths as internal', () => {
     expect(isInternalHref('/de/kontakt')).toBe(true)
     expect(isInternalHref('/kontakt?page=2#team')).toBe(true)
+    expect(isInternalHref('/')).toBe(true)
+  })
+
+  it('treats relative hrefs as external', () => {
+    expect(isInternalHref('foo')).toBe(false)
+    expect(isInternalHref('null')).toBe(false)
+    expect(isInternalHref('./foo')).toBe(false)
+    expect(isInternalHref('../foo')).toBe(false)
+    expect(isInternalHref('?page=2')).toBe(false)
   })
 
   it('treats absolute URLs and protocol-relative URLs as external', () => {
@@ -22,6 +31,7 @@ describe('isInternalHref', () => {
     'ftp://example.com/file.zip',
     'HTTPS://example.com',
     'web+custom:payload',
+    'javascript:void(0)',
   ])('treats %j, which has a URI scheme, as external', (href) => {
     expect(isInternalHref(href)).toBe(false)
   })

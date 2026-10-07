@@ -133,7 +133,7 @@ export function getRouter() {
 
 Returns a `Link` component that takes a plain `href` string, the way CMS links arrive. It needs a use-intl `IntlProvider` above it.
 
-An href renders a plain `<a>` when it is external (any URI scheme such as `https:`, `mailto:`, `tel:` or `sms:`, or starting with `//` or `www.`), empty or hash-only, not a page (see above), or rendered outside a `RouterProvider`. Every other href renders the router's `Link`, prefixed with the target locale. Its query is parsed with the router's own `parseSearch`, so `?page=2` stays `?page=2`.
+An href renders the router's `Link`, prefixed with the target locale, only when it is root-relative (starts with `/`, as in next-intl), is a page (see above) and is rendered inside a `RouterProvider`. Every other href renders a plain `<a>` and the browser resolves it as usual: URLs with a scheme (`https:`, `mailto:`, `tel:`), protocol-relative `//host`, relative hrefs (`foo`, `www.example.com`), hash-only and empty hrefs. Its query is parsed with the router's own `parseSearch`, so `?page=2` stays `?page=2`.
 
 | Prop | Type | Default | |
 |---|---|---|---|

@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Betas may
 break the API; from 1.0.0 on, breaking changes require a major version.
 
+## [Unreleased]
+
+### Fixed
+
+- `Link` treats only root-relative hrefs as internal, as next-intl does. Relative hrefs
+  such as `foo` were prefixed with the locale (`/defoo`); they now render a plain `<a>`.
+
 ## [1.0.0-beta.2] - 2026-10-06
 
 ### Fixed
