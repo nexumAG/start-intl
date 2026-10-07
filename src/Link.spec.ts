@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isInternalHref, splitHref } from './Link.js'
+import { isInternalHref, resolveHref, splitHref } from './Link.js'
 
 describe('isInternalHref', () => {
   it('treats absolute paths as internal', () => {
@@ -41,6 +41,23 @@ describe('isInternalHref', () => {
     expect(isInternalHref('#team')).toBe(false)
     expect(isInternalHref('')).toBe(false)
     expect(isInternalHref(undefined)).toBe(false)
+  })
+})
+
+describe('resolveHref', () => {
+  it('resolves relative hrefs like a browser', () => {
+    expect(resolveHref('foo', '/de/jobs')).toBe('/de/foo')
+    expect(resolveHref('foo', '/de/jobs/')).toBe('/de/jobs/foo')
+    expect(resolveHref('../foo', '/de/jobs/list')).toBe('/de/foo')
+    expect(resolveHref('?page=2', '/de/jobs#top')).toBe('/de/jobs?page=2')
+    expect(resolveHref('#top', '/de/jobs?page=2')).toBe('/de/jobs?page=2#top')
+    expect(resolveHref('', '/de/jobs#top')).toBe('/de/jobs')
+  })
+
+  it('returns undefined when the href leaves the origin', () => {
+    expect(resolveHref('https://nexum.com', '/de')).toBeUndefined()
+    expect(resolveHref('mailto:info@nexum.com', '/de')).toBeUndefined()
+    expect(resolveHref('\\\\evil.com', '/de')).toBeUndefined()
   })
 })
 

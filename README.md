@@ -129,16 +129,34 @@ export function getRouter() {
 }
 ```
 
+### `syncLocaleCookie(router, routing)`
+
+Writes the locale cookie whenever a client-side navigation changes the locale, since those navigations never reach the middleware. It works for every way of navigating: this package's `Link`, the router's own `Link` (`<Link to="." params={{ locale: 'en' }}>`) and `router.navigate`. On the server it does nothing. It returns the router's unsubscribe function.
+
+```ts
+// app/router.tsx
+import { createLocaleRewrite, syncLocaleCookie } from '@nexum-ag/start-intl'
+
+export function getRouter() {
+  const router = createRouter({ routeTree, rewrite: createLocaleRewrite(routing) })
+  syncLocaleCookie(router, routing)
+
+  return router
+}
+```
+
 ### `createLink(routing)`
 
 Returns a `Link` component that takes a plain `href` string, the way CMS links arrive. It needs a use-intl `IntlProvider` above it.
 
-An href renders the router's `Link`, prefixed with the target locale, only when it is root-relative (starts with `/`, as in next-intl), is a page (see above) and is rendered inside a `RouterProvider`. Every other href renders a plain `<a>` and the browser resolves it as usual: URLs with a scheme (`https:`, `mailto:`, `tel:`), protocol-relative `//host`, relative hrefs (`foo`, `www.example.com`), hash-only and empty hrefs. Its query is parsed with the router's own `parseSearch`, so `?page=2` stays `?page=2`.
+Inside a `RouterProvider`, an href that points to a page on the same origin renders the router's `Link`. Root-relative hrefs (`/jobs`) are prefixed with the target locale, as in next-intl. Relative hrefs (`foo`, `../foo`, `?page=2`, `#top`) first resolve against the current URL the way a browser and `next/link` resolve them, so `foo` on `/de/jobs` links to `/de/foo`. They don't use the router's own relative `to`, which would give `/de/jobs/foo`. The query is parsed with the router's own `parseSearch`, so `?page=2` stays `?page=2`.
+
+Everything else renders a plain `<a>` with the href unchanged: URLs with a scheme (`https:`, `mailto:`, `tel:`), protocol-relative `//host`, files and other non-page paths (see above), and any href rendered outside a `RouterProvider`.
 
 | Prop | Type | Default | |
 |---|---|---|---|
 | `href` | `string` | required | With or without a locale prefix, query and hash. |
-| `locale` | `Locale` | the href's prefix, else the current locale | The locale to link to. If it differs from the current locale, clicking the link writes the cookie, because a client-side navigation never reaches the middleware. |
+| `locale` | `Locale` | the href's prefix, else the current locale | The locale to link to. [`syncLocaleCookie`](#synclocalecookierouter-routing) remembers the switch. |
 | `activeOptions` | `ActiveOptions` | `{ exact: true }` | Passed to the router's `Link`. With the default, the home link isn't marked active on every page. |
 | any `<a>` attribute | | | Passed through, including `onClick`. |
 

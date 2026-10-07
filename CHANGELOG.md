@@ -8,10 +8,22 @@ break the API; from 1.0.0 on, breaking changes require a major version.
 
 ## [Unreleased]
 
+### Added
+
+- `syncLocaleCookie(router, routing)` writes the locale cookie whenever a client-side
+  navigation changes the locale, including through the router's own `Link` and
+  `router.navigate`.
+
+### Changed
+
+- **Breaking:** `Link` no longer writes the locale cookie itself. Call
+  `syncLocaleCookie(router, routing)` in `getRouter` to keep remembering locale switches.
+
 ### Fixed
 
-- `Link` treats only root-relative hrefs as internal, as next-intl does. Relative hrefs
-  such as `foo` were prefixed with the locale (`/defoo`); they now render a plain `<a>`.
+- `Link` resolves relative hrefs against the current URL, as a browser and `next/link` do,
+  and navigates to them through the router. `foo` on `/de/jobs` was prefixed with the locale
+  and became `/defoo`; it now links to `/de/foo`.
 
 ## [1.0.0-beta.2] - 2026-10-06
 

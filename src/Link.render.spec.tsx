@@ -5,12 +5,18 @@ import {
   createRouter,
   RouterProvider,
 } from '@tanstack/react-router'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { IntlProvider } from 'use-intl'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createLink } from './Link.js'
-import { createLocaleRewrite } from './request.js'
+import { createLocaleRewrite, syncLocaleCookie } from './request.js'
 import { defineRouting, type Routing } from './routing.js'
 
 const ALWAYS = defineRouting({
@@ -58,6 +64,7 @@ function renderAtLocale(
     rewrite: createLocaleRewrite(routing),
     history: createMemoryHistory({ initialEntries: [path] }),
   })
+  syncLocaleCookie(router, routing)
 
   render(<RouterProvider router={router} />)
 }
@@ -127,7 +134,7 @@ describe('<Link>', () => {
     renderAtLocale(
       'de',
       <>
-        <Link href="/">Deutsch</Link>
+        <Link href="/foo">Deutsch</Link>
         <Link href="/" locale="en">
           English
         </Link>
@@ -135,10 +142,11 @@ describe('<Link>', () => {
     )
 
     fireEvent.click(await screen.findByRole('link', { name: 'Deutsch' }))
+    await screen.findByRole('link', { name: 'Deutsch', current: 'page' })
     expect(document.cookie).not.toContain('NEXT_LOCALE')
 
     fireEvent.click(await screen.findByRole('link', { name: 'English' }))
-    expect(document.cookie).toContain('NEXT_LOCALE=en')
+    await waitFor(() => expect(document.cookie).toContain('NEXT_LOCALE=en'))
   })
 
   it('renders a plain anchor for external hrefs', async () => {
@@ -147,10 +155,31 @@ describe('<Link>', () => {
     expect(await hrefOf('External')).toBe('https://example.com')
   })
 
-  it('renders a plain anchor for relative hrefs', async () => {
-    renderAtLocale('de', <Link href="foo">Foo</Link>)
+  it('resolves relative hrefs against the current page, as a browser would', async () => {
+    renderAtLocale(
+      'de',
+      <>
+        <Link href="foo">Sibling</Link>
+        <Link href="../bar">Parent</Link>
+        <Link href="?page=2">Query</Link>
+        <Link href="#top">Top</Link>
+        <Link href="brochure.pdf">Brochure</Link>
+      </>,
+      ALWAYS,
+      '/de/jobs/list'
+    )
 
-    expect(await hrefOf('Foo')).toBe('foo')
+    expect(await hrefOf('Sibling')).toBe('/de/jobs/foo')
+    expect(await hrefOf('Parent')).toBe('/de/bar')
+    expect(await hrefOf('Query')).toBe('/de/jobs/list?page=2')
+    expect(await hrefOf('Top')).toBe('/de/jobs/list#top')
+    expect(await hrefOf('Brochure')).toBe('brochure.pdf')
+  })
+
+  it('renders a plain anchor for a relative href that leaves the origin', async () => {
+    renderAtLocale('de', <Link href={'\\\\evil.com'}>Evil</Link>)
+
+    expect(await hrefOf('Evil')).toBe('\\\\evil.com')
   })
 
   it('only marks the exact page active unless told otherwise', async () => {
@@ -201,5 +230,16 @@ describe('<Link> with as-needed', () => {
     expect(await hrefOf('Home')).toBe('/')
     expect(await hrefOf('Jobs')).toBe('/jobs')
     expect(await hrefOf('English jobs')).toBe('/en/jobs')
+  })
+
+  it('resolves relative hrefs against the public URL', async () => {
+    renderAtLocale(
+      'de',
+      <AsNeededLink href="foo">Sibling</AsNeededLink>,
+      AS_NEEDED,
+      '/jobs/list'
+    )
+
+    expect(await hrefOf('Sibling')).toBe('/jobs/foo')
   })
 })

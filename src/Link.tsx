@@ -2,14 +2,14 @@ import {
   type ActiveOptions,
   defaultParseSearch,
   Link as RouterLink,
+  useLocation,
   useRouter,
 } from '@tanstack/react-router'
-import type { AnchorHTMLAttributes, MouseEvent } from 'react'
+import type { AnchorHTMLAttributes } from 'react'
 import { useLocale } from 'use-intl'
 import {
   getLocalePrefix,
   isLocalisedPath,
-  serializeLocaleCookie,
   stripLocalePrefix,
 } from './request.js'
 import type { Routing } from './routing.js'
@@ -49,42 +49,51 @@ export type LinkProps<L extends string> = Omit<
   activeOptions?: ActiveOptions
 }
 
+// Resolves like a browser would, so `foo` on `/de/jobs` is `/de/foo`; returns
+// undefined when the href leaves the page's origin.
+export function resolveHref(href: string, pageHref: string) {
+  const page = new URL(pageHref, 'http://localhost')
+  const url = new URL(href, page)
+
+  return url.origin === page.origin
+    ? `${url.pathname}${url.search}${url.hash}`
+    : undefined
+}
+
 // Internal hrefs target the `$locale` route tree; with 'as-needed' the router's
 // `createLocaleRewrite` drops the default locale from the rendered URL.
 export function createLink<L extends string>(routing: Routing<L>) {
-  return function Link({
+  function RoutedLink({
     href,
     locale,
-    onClick,
     activeOptions = { exact: true },
     ...anchorProps
   }: LinkProps<L>) {
     const currentLocale = useLocale()
-    // Missing in renders outside a RouterProvider, such as an off-screen SSR pass.
-    const router = useRouter({ warn: false })
+    const router = useRouter()
+    const isRootRelative = href.startsWith('/')
+    const pageHref = useLocation({
+      select: (location) => (isRootRelative ? undefined : location.publicHref),
+    })
+    const internalHref =
+      pageHref === undefined ? href : resolveHref(href, pageHref)
+
+    if (internalHref === undefined || !isInternalHref(internalHref)) {
+      return <a href={href} {...anchorProps} />
+    }
+
     const { pathname, search, hash } = splitHref(
-      href,
-      router?.options.parseSearch
+      internalHref,
+      router.options.parseSearch
     )
 
-    if (!router || !isInternalHref(href) || !isLocalisedPath(pathname)) {
-      return <a href={href} onClick={onClick} {...anchorProps} />
+    if (!isLocalisedPath(pathname)) {
+      return <a href={href} {...anchorProps} />
     }
 
     const targetLocale =
       locale ?? getLocalePrefix(pathname, routing) ?? currentLocale
     const path = stripLocalePrefix(pathname, routing)
-
-    // A client-side switch never reaches the request middleware, so the link
-    // remembers the choice itself, as next-intl's Link did.
-    const handleClick =
-      locale && locale !== currentLocale
-        ? (event: MouseEvent<HTMLAnchorElement>) => {
-            // biome-ignore lint/suspicious/noDocumentCookie: the Cookie Store API is async and not in every supported browser
-            document.cookie = serializeLocaleCookie(locale, routing)
-            onClick?.(event)
-          }
-        : onClick
 
     return (
       <RouterLink
@@ -92,9 +101,21 @@ export function createLink<L extends string>(routing: Routing<L>) {
         search={search}
         hash={hash}
         activeOptions={activeOptions}
-        onClick={handleClick}
         {...anchorProps}
       />
     )
+  }
+
+  return function Link(props: LinkProps<L>) {
+    // Missing in renders outside a RouterProvider, such as an off-screen SSR pass.
+    const router = useRouter({ warn: false })
+
+    if (!router) {
+      const { locale, activeOptions, ...anchorProps } = props
+
+      return <a {...anchorProps} />
+    }
+
+    return <RoutedLink {...props} />
   }
 }

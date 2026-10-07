@@ -1,3 +1,4 @@
+import type { AnyRouter } from '@tanstack/react-router'
 import type { Routing } from './routing.js'
 
 const NON_PAGE_PREFIXES = [
@@ -64,6 +65,27 @@ export function serializeLocaleCookie(locale: string, routing: Routing) {
   const lifetime = maxAge === undefined ? '' : `; Max-Age=${maxAge}`
 
   return `${name}=${locale}; Path=/${lifetime}; SameSite=lax`
+}
+
+// A client-side navigation never reaches the request middleware, so the
+// router remembers a locale switch itself, as next-intl's navigation APIs do.
+export function syncLocaleCookie(router: AnyRouter, routing: Routing) {
+  if (typeof document === 'undefined') {
+    return () => {}
+  }
+
+  return router.subscribe('onResolved', ({ fromLocation, toLocation }) => {
+    const locale = getLocalePrefix(toLocation.pathname, routing)
+
+    if (
+      fromLocation &&
+      locale &&
+      locale !== getLocalePrefix(fromLocation.pathname, routing)
+    ) {
+      // biome-ignore lint/suspicious/noDocumentCookie: the Cookie Store API is async and not in every supported browser
+      document.cookie = serializeLocaleCookie(locale, routing)
+    }
+  })
 }
 
 export function getAcceptLanguageLocale<L extends string>(
