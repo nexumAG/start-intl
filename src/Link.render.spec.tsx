@@ -172,7 +172,10 @@ describe('<Link>', () => {
     expect(await hrefOf('Sibling')).toBe('/de/jobs/foo')
     expect(await hrefOf('Parent')).toBe('/de/bar')
     expect(await hrefOf('Query')).toBe('/de/jobs/list?page=2')
-    expect(await hrefOf('Top')).toBe('/de/jobs/list#top')
+    expect(await hrefOf('Top')).toBe('#top')
+    expect(
+      screen.getByRole('link', { name: 'Top' }).getAttribute('aria-current')
+    ).toBeNull()
     expect(await hrefOf('Brochure')).toBe('brochure.pdf')
   })
 

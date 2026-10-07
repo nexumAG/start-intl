@@ -109,8 +109,11 @@ export function createLink<L extends string>(routing: Routing<L>) {
   return function Link(props: LinkProps<L>) {
     // Missing in renders outside a RouterProvider, such as an off-screen SSR pass.
     const router = useRouter({ warn: false })
+    // Same-page anchors stay native, as with next/link: the browser moves focus
+    // to the target and fires `hashchange`.
+    const isSamePageAnchor = props.href.startsWith('#')
 
-    if (!router) {
+    if (!router || isSamePageAnchor) {
       const { locale, activeOptions, ...anchorProps } = props
 
       return <a {...anchorProps} />

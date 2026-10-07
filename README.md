@@ -154,9 +154,9 @@ export function getRouter() {
 
 Returns a `Link` component that takes a plain `href` string, the way CMS links arrive. It needs a use-intl `IntlProvider` above it.
 
-Inside a `RouterProvider`, an href that points to a page on the same origin renders the router's `Link`. Root-relative hrefs (`/jobs`) are prefixed with the target locale, as in next-intl. Relative hrefs (`foo`, `../foo`, `?page=2`, `#top`) first resolve against the current URL the way a browser and `next/link` resolve them, so `foo` on `/de/jobs` links to `/de/foo`. They don't use the router's own relative `to`, which would give `/de/jobs/foo`. The query is parsed with the router's own `parseSearch`, so `?page=2` stays `?page=2`.
+Inside a `RouterProvider`, an href that points to a page on the same origin renders the router's `Link`. Root-relative hrefs (`/jobs`) are prefixed with the target locale, as in next-intl. Relative hrefs (`foo`, `../foo`, `?page=2`) first resolve against the current URL the way a browser and `next/link` resolve them, so `foo` on `/de/jobs` links to `/de/foo`. They don't use the router's own relative `to`, which would give `/de/jobs/foo`. The query is parsed with the router's own `parseSearch`, so `?page=2` stays `?page=2`.
 
-Everything else renders a plain `<a>` with the href unchanged: URLs with a scheme (`https:`, `mailto:`, `tel:`), protocol-relative `//host`, files and other non-page paths (see above), and any href rendered outside a `RouterProvider`.
+Everything else renders a plain `<a>` with the href unchanged: URLs with a scheme (`https:`, `mailto:`, `tel:`), protocol-relative `//host`, same-page anchors (`#top`), files and other non-page paths (see above), and any href rendered outside a `RouterProvider`.
 
 | Prop | Type | Default | |
 |---|---|---|---|
