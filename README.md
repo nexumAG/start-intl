@@ -31,6 +31,11 @@ npm install @nexum-ag/start-intl
 > [!NOTE]
 > `@tanstack/react-router`, `@tanstack/react-start`, `react` 19 and `use-intl` 4 are peer dependencies, so the package uses your app's copies.
 
+Two minimal TanStack Start apps show the full setup:
+
+- [`examples/as-needed`](./examples/as-needed): the default locale has no prefix (`/about`, `/de/about`), with the router rewrite, a one-year cookie and hreflang `Link` headers.
+- [`examples/always`](./examples/always): every URL has a prefix (`/en/about`, `/de/about`), so the router needs no rewrite.
+
 ## 🧭 How a request gets its locale
 
 The first match wins:
@@ -247,6 +252,15 @@ npm test           # vitest
 npm run typecheck  # tsc --noEmit
 npm run lint       # biome
 npm run check:pkg  # build, then publint + are-the-types-wrong
+```
+
+Run an example (after building the library so its `dist/` exists):
+
+```bash
+npm run build
+cd examples/as-needed  # or examples/always
+npm install            # links the library via file:../..
+npm run dev
 ```
 
 ### Tech stack
