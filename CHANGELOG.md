@@ -6,6 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Betas may
 break the API; from 1.0.0 on, breaking changes require a major version.
 
+## [Unreleased]
+
+### Fixed
+
+- The locale middleware appends its `Set-Cookie` and `Link` headers instead of
+  replacing them. On TanStack Start 1.169 (stable) and later, replacing them dropped every other
+  cookie the app set in the same request, such as a session cookie.
+
 ## [1.0.0-beta.3] - 2026-10-07
 
 ### Added

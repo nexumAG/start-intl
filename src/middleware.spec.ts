@@ -1,4 +1,4 @@
-import { getCookie, setResponseHeader } from '@tanstack/react-start/server'
+import { appendResponseHeader, getCookie } from '@tanstack/react-start/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createLocaleMiddleware,
@@ -8,7 +8,7 @@ import { defineRouting } from './routing.js'
 
 vi.mock('@tanstack/react-start/server', () => ({
   getCookie: vi.fn(),
-  setResponseHeader: vi.fn(),
+  appendResponseHeader: vi.fn(),
 }))
 
 const routing = defineRouting({
@@ -45,7 +45,7 @@ function handle(
 }
 
 const setHeaders = () =>
-  Object.fromEntries(vi.mocked(setResponseHeader).mock.calls)
+  Object.fromEntries(vi.mocked(appendResponseHeader).mock.calls)
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -92,7 +92,7 @@ describe('createLocaleMiddleware', () => {
     expect(getCookie).toHaveBeenCalledWith('NEXT_LOCALE')
     expect(next).toHaveBeenCalledOnce()
     expect(result).toBe(passedOn)
-    expect(setResponseHeader).not.toHaveBeenCalled()
+    expect(appendResponseHeader).not.toHaveBeenCalled()
   })
 
   it('applies the locale override', () => {

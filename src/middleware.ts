@@ -1,5 +1,5 @@
 import { createMiddleware } from '@tanstack/react-start'
-import { getCookie, setResponseHeader } from '@tanstack/react-start/server'
+import { appendResponseHeader, getCookie } from '@tanstack/react-start/server'
 import { resolveRequestRouting, serializeLocaleCookie } from './request.js'
 import type { Routing } from './routing.js'
 
@@ -44,11 +44,11 @@ export function createLocaleMiddleware<L extends string>(
     }
 
     if (setCookie) {
-      setResponseHeader('set-cookie', setCookie)
+      appendResponseHeader('set-cookie', setCookie)
     }
 
     if (sendAlternateLinks && alternateLinks) {
-      setResponseHeader('link', alternateLinks)
+      appendResponseHeader('link', alternateLinks)
     }
 
     return next()
